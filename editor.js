@@ -1,6 +1,6 @@
 import { error, isEmptyValue, getJsonValue } from './utils';
 
-const Editor = require('./lib/wangeditor').wangEditor;
+const Editor = require('./lib/wangeditor');
 
 /**
  * input组件
