@@ -1,5 +1,5 @@
 {
-  "name": "mc-form-editor",
+  "name": "@hxy/mc-form-editor",
   "version": "1.0.3",
   "description": "editor for mc-form",
   "main": "dist/index.js",
@@ -39,5 +39,6 @@
     "vue-template-compiler": "^2.6.11",
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11"
-  }
+  },
+  "dependencies": {}
 }
