@@ -8,8 +8,8 @@ npm install mc-form-editor -S
 
 ```javascript
 import Vue from 'vue';
-import McFormEditor from './mc-form-editor';
-import McForm, { installComponent } from './mc-form';
+import McFormEditor from 'mc-form-editor';
+import McForm, { installComponent } from 'mc-form';
 
 installComponent(McFormEditor);
 
