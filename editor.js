@@ -1,6 +1,6 @@
 import { error, isEmptyValue, getJsonValue } from './utils';
 
-const Editor = require('./lib/wangeditor');
+const Editor = require('./lib/wangeditor').wangEditor;
 
 /**
  * input组件
@@ -54,7 +54,7 @@ export default {
   watch: {
     value() {
       // 来自自身的emit 不做修改 避免二次渲染
-      if (this._equal) {
+      if (this.equal) {
         return;
       }
 
@@ -63,7 +63,14 @@ export default {
 
     disabled: 'setEditable',
 
-    readonly: 'setEditable'
+    readonly: 'setEditable',
+
+    hidden: {
+      immediate: true,
+      handler(hidden) {
+        !hidden && this.$nextTick(this.init);
+      }
+    }
   },
 
   render(h) {
@@ -137,65 +144,92 @@ export default {
     },
 
     setValue() {
+      if (!this.editor) {
+        return;
+      }
+
       this.editor.txt.html(isEmptyValue(this.value) ? '' : this.value);
     },
 
     setEditable() {
+      if (!this.editor) {
+        return;
+      }
+
       let editable = !(this.disabled || this.readonly);
 
       this.editor.$textElem.attr('contenteditable', editable);
     },
 
     notice(value) {
-      this._equal = true;
+      this.equal = true;
       this.$emit('input', value);
 
       let component = this.$refs.item;
 
       component.$emit('el.form.change');
 
-      this.$nextTick(_ => (this._equal = false));
+      this.$nextTick(_ => (this.equal = false));
+    },
+
+    init() {
+      let node = this.$refs.editor;
+
+      if (this.editor) {
+        if (!node.querySelector('div')) {
+          node.appendChild(this.editor.dom);
+        }
+
+        return;
+      }
+
+      let config = this.config.editor;
+      let dom = document.createElement('div');
+      let editor = this.editor = new Editor(dom);
+      let customConfig = editor.customConfig;
+
+      editor.dom = dom;
+
+      node.appendChild(dom);
+
+      customConfig.menus = config.menus;
+      customConfig.colors = config.colors;
+      customConfig.zIndex = config.zIndex;
+      customConfig.uploadImgMaxSize = config.uploadImgMaxSize;
+      customConfig.uploadImgShowBase64 = config.uploadImgShowBase64;
+      customConfig.customUploadImg = (files, insert) => {
+        this.handleFiles(files, insert);
+      };
+      customConfig.onchange = html => {
+        // 这里做一下空值处理 不怎么严谨
+        if (html === '<p><br></p>') {
+          html = '';
+        }
+
+        this.notice(html);
+      };
+
+      customConfig.onblur = _ => {
+        let component = this.$refs.item;
+
+        component.$emit('el.form.blur');
+      };
+
+      editor.create();
+
+      this.setValue();
+      this.setEditable();
+    },
+
+    clear() {
+      this.editor = null;
     }
   },
 
   created() {
-    this.Q = [];
     this.L = 2;
     this.I = 0;
-    this._equal = false;
-  },
-
-  mounted() {
-    let config = this.config.editor;
-    let editor = this.editor = new Editor(this.$refs.editor);
-    let customConfig = editor.customConfig;
-
-    customConfig.menus = config.menus;
-    customConfig.colors = config.colors;
-    customConfig.zIndex = config.zIndex;
-    customConfig.uploadImgMaxSize = config.uploadImgMaxSize;
-    customConfig.uploadImgShowBase64 = config.uploadImgShowBase64;
-    customConfig.customUploadImg = (files, insert) => {
-      this.handleFiles(files, insert);
-    };
-    customConfig.onchange = html => {
-      // 这里做一下空值处理 不怎么严谨
-      if (html === '<p><br></p>') {
-        html = '';
-      }
-
-      this.notice(html);
-    };
-
-    customConfig.onblur = _ => {
-      let component = this.$refs.item;
-
-      component.$emit('el.form.blur');
-    };
-
-    editor.create();
-
-    this.setValue();
-    this.setEditable();
+    this.Q = [];
+    this.equal = false;
   }
 };

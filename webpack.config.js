@@ -1,15 +1,31 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
+const M = {
+  umd: {
+    libraryTarget: 'umd',
+    filename: '[name].umd.js'
+  },
+
+  commonjs2: {
+    filename: '[name].js',
+    libraryTarget: 'commonjs2'
+  }
+};
+
+const T = process.env.OUTPUT_TARGET;
+
 module.exports = {
   mode: 'production',
-  entry: './index.js',
+  entry: {
+    'mc-form-editor': './index.js',
+  },
+
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'index.js',
     library: 'McFormEditor',
-    libraryTarget: 'commonjs2',
-    globalObject: 'this'
+    globalObject: 'this',
+    ...M[T]
   },
   module: {
     rules: [
