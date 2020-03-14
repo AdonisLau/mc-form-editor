@@ -1,6 +1,6 @@
 {
   "name": "mc-form-editor",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "editor for mc-form",
   "main": "dist/mc-form-editor.js",
   "directories": {
