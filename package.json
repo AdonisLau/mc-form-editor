@@ -1,7 +1,7 @@
 {
   "name": "mc-form-editor",
-  "version": "1.0.5",
-  "description": "editor for mc-form",
+  "version": "1.0.6",
+  "description": "editor for mc-form, based on wangEditor",
   "main": "dist/mc-form-editor.js",
   "directories": {
     "lib": "lib"

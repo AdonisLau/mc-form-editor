@@ -134,7 +134,7 @@ export default {
 
       request.post(config.uploadURL, formData)
         .then(res => {
-          insert(getJsonValue(res, config.path));
+          insert(!config.path ? res : getJsonValue(res, config.path));
         })
         .catch(e => this.$message.error(e.message))
         .then(_ => {
