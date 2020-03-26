@@ -45,9 +45,10 @@ export default {
   // 使用后端接口返回的结果，根据该路径去获取图片上传路径
   path: 'content',
   // 上传接口
-  uploadURL: null,
+  action: null,
   // 上传名称
   uploadFileName: 'file',
   uploadImgShowBase64: false,
   uploadImgMaxSize: 1 * 1024 * 1024,
+  onSuccess: _ => ({ success: true })
 };

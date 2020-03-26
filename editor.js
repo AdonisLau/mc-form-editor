@@ -1,4 +1,4 @@
-import { error, isEmptyValue, getJsonValue } from './utils';
+import { isEmptyValue, getJsonValue } from './utils';
 
 const Editor = require('./lib/wangeditor');
 
@@ -48,6 +48,12 @@ export default {
 
     readonly() {
       return this.config.ui.readonly(this.state);
+    },
+
+    uploadURL() {
+      let config = this.config.editor;
+
+      return config.action || config.uploadURL;
     }
   },
 
@@ -115,14 +121,12 @@ export default {
     },
 
     upload({ file, insert }) {
-      let config = this.config.editor;
+      let uploadURL = this.uploadURL;
 
-      if (!config.uploadURL) {
-        return error('editor.uploadURL is required');
-      }
+      let config = this.config.editor;
+      let formData = new FormData();
 
       let data = config.data;
-      let formData = new FormData();
 
       Object.keys(data).forEach(key => {
         formData.append(key, data[key]);
@@ -130,10 +134,22 @@ export default {
 
       formData.append(config.uploadFileName, file);
 
-      let request = this.getRequest();
+      let promise = null;
 
-      request.post(config.uploadURL, formData)
+      if (config.request) {
+        promise = config.request(formData);
+      } else {
+        promise = this.getRequest().post(uploadURL, formData);
+      }
+
+      promise
         .then(res => {
+          let ret = config.onSuccess(res);
+
+          if (!ret.success) {
+            return Promise.reject(new Error(ret.message));
+          }
+
           insert(!config.path ? res : getJsonValue(res, config.path));
         })
         .catch(e => this.$message.error(e.message))
