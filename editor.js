@@ -159,13 +159,17 @@ export default {
         });
     },
 
+    getValue() {
+      return isEmptyValue(this.value) ? '' : this.value;
+    },
+
     setValue() {
       if (!this.editor) {
         return;
       }
 
       this.tiggerValidate('el.form.change');
-      this.editor.txt.html(isEmptyValue(this.value) ? '' : this.value);
+      this.editor.txt.html(this.getValue());
     },
 
     setEditable() {
@@ -185,7 +189,6 @@ export default {
     notice(value) {
       this.equal = true;
       this.$emit('input', value);
-      this.$emit('change', value);
 
       this.tiggerValidate('el.form.change');
 
@@ -217,9 +220,11 @@ export default {
       customConfig.zIndex = config.zIndex;
       customConfig.uploadImgMaxSize = config.uploadImgMaxSize;
       customConfig.uploadImgShowBase64 = config.uploadImgShowBase64;
+
       customConfig.customUploadImg = (files, insert) => {
         this.handleFiles(files, insert);
       };
+
       customConfig.onchange = html => {
         // 这里做一下空值处理 不怎么严谨
         if (html === '<p><br></p>') {
@@ -229,13 +234,21 @@ export default {
         this.notice(html);
       };
 
+      let rawValue = '';
+
       customConfig.onblur = v => {
         this.$emit('blur', v);
+
+        if (v !== rawValue) {
+          this.$emit('change', v);
+        }
+
         this.tiggerValidate('el.form.blur');
       };
 
       customConfig.onfocus = v => {
         this.$emit('focus', v);
+        rawValue = this.getValue();
       };
 
       editor.create();
