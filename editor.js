@@ -164,6 +164,7 @@ export default {
         return;
       }
 
+      this.tiggerValidate('el.form.change');
       this.editor.txt.html(isEmptyValue(this.value) ? '' : this.value);
     },
 
@@ -177,13 +178,16 @@ export default {
       this.editor.$textElem.attr('contenteditable', editable);
     },
 
+    tiggerValidate(name) {
+      this.$refs.item.$emit(name);
+    },
+
     notice(value) {
       this.equal = true;
       this.$emit('input', value);
+      this.$emit('change', value);
 
-      let component = this.$refs.item;
-
-      component.$emit('el.form.change');
+      this.tiggerValidate('el.form.change');
 
       this.$nextTick(_ => (this.equal = false));
     },
@@ -225,10 +229,13 @@ export default {
         this.notice(html);
       };
 
-      customConfig.onblur = _ => {
-        let component = this.$refs.item;
+      customConfig.onblur = v => {
+        this.$emit('blur', v);
+        this.tiggerValidate('el.form.blur');
+      };
 
-        component.$emit('el.form.blur');
+      customConfig.onfocus = v => {
+        this.$emit('focus', v);
       };
 
       editor.create();
