@@ -168,7 +168,7 @@ export default {
         return;
       }
 
-      this.tiggerValidate('el.form.change');
+      this.triggerValidate('el.form.change');
       this.editor.txt.html(this.getValue());
     },
 
@@ -182,15 +182,19 @@ export default {
       this.editor.$textElem.attr('contenteditable', editable);
     },
 
-    tiggerValidate(name) {
-      this.$refs.item.$emit(name);
+    triggerValidate(name) {
+      let component = this.$refs.item;
+
+      if (component) {
+        component.$emit(name);
+      }
     },
 
     notice(value) {
       this.equal = true;
       this.$emit('input', value);
 
-      this.tiggerValidate('el.form.change');
+      this.triggerValidate('el.form.change');
 
       this.$nextTick(_ => (this.equal = false));
     },
@@ -243,7 +247,7 @@ export default {
           this.$emit('change', v);
         }
 
-        this.tiggerValidate('el.form.blur');
+        this.triggerValidate('el.form.blur');
       };
 
       customConfig.onfocus = v => {
